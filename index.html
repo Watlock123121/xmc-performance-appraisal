@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#e5391d" />
+<title>XMC BPO | Performance Appraisal</title>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<style>
+    :root {
+      --green-900: #8f1d14;
+      --green-800: #b32618;
+      --green-700: #df2b1f;
+      --green-600: #ef4b16;
+      --green-500: #ff6a00;
+      --green-100: #fff0e7;
+      --green-050: #fff8f4;
+      --ink: #202124;
+      --muted: #69717a;
+      --line: #eaded8;
+      --surface: #ffffff;
+      --surface-2: #fbf8f6;
+      --danger: #b42318;
+      --danger-bg: #fff2f0;
+      --warning: #9a5a00;
+      --shadow: 0 14px 36px rgba(155, 45, 18, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% -10%, rgba(255,106,0,.10), transparent 30%),
+        linear-gradient(180deg, #fff7f3 0%, #fbf8f6 45%, #f8f5f3 100%);
+    }
+
+    button, input, textarea, select { font: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      color: #fff;
+      background: linear-gradient(135deg, var(--green-900), var(--green-700));
+      box-shadow: 0 4px 18px rgba(143, 29, 20, .18);
+    }
+
+    .topbar-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 20px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+    }
+
+    .brand-text strong { display: block; font-size: 16px; letter-spacing: .2px; }
+    .brand-text span { display: block; margin-top: 2px; font-size: 12px; opacity: .82; }
+
+    .topbar-badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.2);
+      white-space: nowrap;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 34px auto 70px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 30px;
+      background: linear-gradient(135deg, #ffffff 0%, #fff4ec 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      right: -70px;
+      top: -100px;
+      background: rgba(255,106,0,.08);
+    }
+
+    .eyebrow {
+      color: var(--green-700);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .hero-score {
+      position: relative;
+      z-index: 1;
+      width: 150px;
+      height: 150px;
+      border-radius: 26px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 24px rgba(179,38,24,.08);
+    }
+
+    .hero-score span { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+    .hero-score strong { display: block; margin-top: 4px; color: var(--green-700); font-size: 38px; line-height: 1; }
+    .hero-score small { color: var(--muted); font-size: 12px; }
+
+    .form-section {
+      margin-top: 20px;
+      padding: 26px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(179,38,24,.045);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .section-number {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      background: linear-gradient(135deg, var(--green-700), var(--green-500));
+      box-shadow: 0 6px 14px rgba(223,43,31,.18);
+    }
+
+    .section-heading h2 { margin: 0; font-size: 21px; letter-spacing: -.01em; }
+    .section-heading p { margin: 5px 0 0; color: var(--muted); line-height: 1.5; font-size: 14px; }
+
+    .grid-2, .grid-3 {
+      display: grid;
+      gap: 16px;
+    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .field { min-width: 0; }
+
+    label.field-label {
+      display: block;
+      margin-bottom: 7px;
+      color: #3d3a38;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .required::after { content: " *"; color: #c0392b; }
+
+    input[type="text"], input[type="email"], input[type="date"], textarea, select {
+      width: 100%;
+      border: 1px solid #ded4cf;
+      border-radius: 11px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    input[type="text"], input[type="email"], input[type="date"], select {
+      min-height: 44px;
+      padding: 10px 12px;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      padding: 11px 12px;
+      line-height: 1.5;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(255,106,0,.10);
+    }
+
+    input[readonly] {
+      background: #f2f6f3;
+      color: var(--green-800);
+      font-weight: 800;
+    }
+
+    .assessment-types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .check-chip {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .check-chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .check-chip span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: 1px solid #ded4cf;
+      color: #4c4744;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      transition: .18s ease;
+    }
+
+    .check-chip input:checked + span {
+      color: #fff;
+      border-color: var(--green-700);
+      background: var(--green-700);
+      box-shadow: 0 5px 12px rgba(15,107,58,.16);
+    }
+
+    .rating-guide {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0 0 18px;
+    }
+
+    .rating-guide div {
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid var(--line);
+      background: var(--green-050);
+    }
+
+    .rating-guide strong { display: block; color: var(--green-700); font-size: 16px; }
+    .rating-guide span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.25; }
+
+    .goal-card, .competency-card, .development-row {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .goal-card + .goal-card, .competency-card + .competency-card { margin-top: 14px; }
+
+    .goal-head, .competency-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--green-050);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .goal-head strong, .competency-head strong { color: var(--green-800); }
+
+    .weight-pill {
+      flex: 0 0 auto;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: var(--green-800);
+      background: var(--green-100);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .goal-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.15fr 145px;
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .evidence-preview {
+      display: none;
+      margin-top: 7px;
+      color: var(--green-700);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .evidence-preview:hover { text-decoration: underline; }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 16px;
+      align-items: center;
+      margin-top: 16px;
+      padding: 15px 16px;
+      border-radius: 13px;
+      background: var(--green-050);
+      border: 1px solid var(--line);
+    }
+
+    .score-row p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .competency-body { padding: 0 16px 16px; }
+
+    .competency-line {
+      display: grid;
+      grid-template-columns: minmax(240px, .95fr) minmax(260px, 1.35fr) 130px;
+      gap: 14px;
+      align-items: start;
+      padding-top: 16px;
+    }
+
+    .descriptor {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      color: #4b4744;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .textarea-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .development-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .development-row { padding: 16px; }
+    .development-row h3 { margin: 0 0 14px; color: var(--green-800); font-size: 15px; }
+    .development-fields {
+      display: grid;
+      grid-template-columns: 1.1fr 1.4fr .8fr 1.25fr .8fr;
+      gap: 12px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      min-height: 130px;
+      padding: 18px;
+      border-radius: 15px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .summary-card.overall {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--green-800), var(--green-600));
+    }
+
+    .summary-card span { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .summary-card.overall span { color: rgba(255,255,255,.78); }
+    .summary-card strong { color: var(--green-800); font-size: 34px; letter-spacing: -.03em; }
+    .summary-card.overall strong { color: #fff; }
+    .summary-card small { color: var(--muted); font-size: 11px; }
+    .summary-card.overall small { color: rgba(255,255,255,.72); }
+
+    .signature-note {
+      padding: 14px 16px;
+      border-radius: 12px;
+      color: #67483c;
+      background: var(--green-050);
+      border: 1px dashed #e4bda7;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .signature-card {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface-2);
+    }
+
+    .signature-card h3 {
+      margin: 0;
+      color: var(--green-800);
+      font-size: 15px;
+    }
+
+    .signature-card p {
+      margin: 5px 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .signature-canvas-wrap {
+      overflow: hidden;
+      border: 1px solid #ded4cf;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .signature-canvas {
+      display: block;
+      width: 100%;
+      height: 180px;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .signature-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .signature-state {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .signature-state.signed { color: var(--green-700); }
+
+    .btn-small {
+      min-height: 34px;
+      padding: 7px 11px;
+      font-size: 12px;
+      border-radius: 9px;
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 14px;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+      padding: 14px;
+      border-radius: 15px;
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 34px rgba(143,29,20,.12);
+      backdrop-filter: blur(10px);
+    }
+
+    .action-left { color: var(--muted); font-size: 12px; }
+    .action-buttons { display: flex; gap: 10px; }
+
+    .btn {
+      min-height: 43px;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 11px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--green-700), var(--green-500));
+      box-shadow: 0 8px 18px rgba(223,43,31,.18);
+    }
+
+    .btn-secondary {
+      color: var(--green-800);
+      background: #fff;
+      border: 1px solid #e0bba8;
+    }
+
+    .field-error {
+      margin-top: 6px;
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .invalid-field {
+      border-color: #d92d20 !important;
+      box-shadow: 0 0 0 3px rgba(217,45,32,.08) !important;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(17, 30, 22, .45);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-backdrop.show { display: flex; }
+
+    .modal {
+      width: min(460px, 100%);
+      padding: 24px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 60px rgba(0,0,0,.18);
+    }
+
+    .modal-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      background: var(--green-700);
+    }
+
+    .modal.error .modal-icon { background: var(--danger); }
+    .modal.warning .modal-icon { background: #9a6700; }
+    .modal h3 { margin: 0; font-size: 19px; }
+    .modal p { margin: 8px 0 18px; color: var(--muted); line-height: 1.55; font-size: 14px; }
+
+    .helper { margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+
+    @media (max-width: 1000px) {
+      .goal-body { grid-template-columns: 1fr 1fr; }
+      .competency-line { grid-template-columns: 1fr 1fr; }
+      .competency-line .rating-field { grid-column: 2; }
+      .development-fields { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-inner, .page { width: min(100% - 20px, 1180px); }
+      .topbar-badge { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 22px; }
+      .hero-score { width: 100%; height: auto; min-height: 112px; grid-template-columns: auto auto auto; padding: 18px; text-align: left; }
+      .hero-score strong { margin: 0 8px; }
+      .form-section { padding: 19px; }
+      .grid-2, .grid-3, .goal-body, .competency-line, .textarea-pair, .development-fields, .summary-grid, .score-row { grid-template-columns: 1fr; }
+      .competency-line .rating-field { grid-column: auto; }
+      .rating-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .actions { position: static; flex-direction: column; align-items: stretch; }
+      .action-buttons { width: 100%; }
+      .action-buttons .btn { flex: 1; }
+    }
+
+    @media (max-width: 900px) { .signature-grid { grid-template-columns: 1fr; } }
+
+    @media print {
+      body { background: #fff; }
+      .topbar, .actions, .no-print { display: none !important; }
+      .page { width: 100%; margin: 0; }
+      .hero, .form-section { box-shadow: none; break-inside: avoid; }
+      .form-section { margin-top: 12px; }
+    }
+  
+    /* Fixed appraisal criteria: locked by default, click to edit */
+    .click-to-edit-field[readonly] {
+        background: #fbf4f0;
+        border-color: #e0cfc7;
+        color: #5f3328;
+        cursor: pointer;
+    }
+    .click-to-edit-field[readonly]:hover {
+        background: #fff0e9;
+        border-color: #e08761;
+    }
+    .click-to-edit-field.is-editing {
+        background: #ffffff;
+        border-color: #e23b21;
+        box-shadow: 0 0 0 3px rgba(226,59,33,0.12);
+        cursor: text;
+    }
+    .editable-hint {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #63746a;
+        font-weight: 500;
+    }
+
+
+    .optional-badge {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #fff0e8;
+        border: 1px solid #e6c3b2;
+        color: #9b3a24;
+        font-size: 11px;
+        font-weight: 700;
+        vertical-align: middle;
+    }
+
+
+    /* Dynamic KPI table */
+    .kpi-section-heading { align-items: center; }
+    .section-heading-copy { min-width: 0; }
+    .btn-add-kpi { margin-left: auto; white-space: nowrap; }
+    .kpi-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+    .kpi-table { width: 100%; min-width: 900px; border-collapse: collapse; background: #fff; }
+    .kpi-table th {
+      padding: 12px 10px;
+      text-align: left;
+      color: var(--green-800);
+      background: var(--green-050);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .kpi-table td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .kpi-table tr:last-child td { border-bottom: 0; }
+    .kpi-table .kpi-col-name { width: 21%; }
+    .kpi-table .kpi-col-goal { width: 22%; }
+    .kpi-table .kpi-col-actual { width: 25%; }
+    .kpi-table .kpi-col-weight { width: 11%; }
+    .kpi-table .kpi-col-rating { width: 11%; }
+    .kpi-table .kpi-col-action { width: 10%; text-align: center; }
+    .kpi-table textarea { min-height: 44px; }
+    .kpi-table input[type="number"] {
+      width: 100%; min-height: 44px; padding: 10px 12px;
+      border: 1px solid #ded4cf; border-radius: 11px; outline: none;
+    }
+    .kpi-table input[type="number"]:focus { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(255,106,0,.10); }
+    .kpi-delete {
+      min-height: 42px; min-width: 42px; padding: 8px 10px;
+      border: 1px solid #f0b8b2; border-radius: 10px;
+      background: var(--danger-bg); color: var(--danger); cursor: pointer; font-weight: 800;
+    }
+    .kpi-delete:disabled { opacity: .35; cursor: not-allowed; }
+    .kpi-weight-status { margin-top: 7px; color: var(--warning); font-size: 12px; font-weight: 800; }
+    .kpi-weight-status.valid { color: var(--green-700); }
+    .kpi-weight-status.invalid { color: var(--danger); }
+    .kpi-score-row { grid-template-columns: 1fr 260px; }
+
+</style>
+</head>
+<body>
+<header class="topbar">
+<div class="topbar-inner">
+<div class="brand">
+<div class="brand-mark">X</div>
+<div class="brand-text">
+<strong>XMC BPO</strong>
+<span>Performance Management</span>
+</div>
+</div>
+<div class="topbar-badge">Performance Evaluation</div>
+</div>
+</header>
+<main class="page">
+<section class="hero">
+<div>
+<div class="eyebrow">Employee Performance Appraisal</div>
+<h1>Performance Evaluation Form</h1>
+<p>Complete the employee information, performance goals, personal effectiveness assessment, development plan, and final comments. Scores are calculated automatically.</p>
+</div>
+<div class="hero-score" aria-label="Overall score">
+<span>Overall Score</span>
+<strong id="heroOverall">—</strong>
+<small>out of 5.0</small>
+</div>
+</section>
+<form id="appraisalForm" novalidate>
+<!-- 01 Employee Information -->
+<section class="form-section">
+<div class="section-heading">
+<div class="section-number">01</div>
+<div>
+<h2>Employee &amp; Assessment Information</h2>
+<p>Enter the employee details and the assessment coverage.</p>
+</div>
+</div>
+<div class="grid-2">
+<div class="field">
+<label class="field-label required" for="employee_name">Employee Name</label>
+<input id="employee_name" type="text" name="employee_name" autocomplete="name" required />
+</div>
+<div class="field">
+<label class="field-label required" for="position">Position</label>
+<input id="position" type="text" name="position" required />
+</div>
+<div class="field">
+<label class="field-label required" for="supervised_by">Supervised By</label>
+<input id="supervised_by" type="text" name="supervised_by" required />
+</div>
+<div class="field">
+<label class="field-label required" for="department">Department</label>
+<input id="department" type="text" name="department" required />
+</div>
+<div class="field">
+<label class="field-label required" for="assessment_date">Assessment Date</label>
+<input
+  id="assessment_date"
+  type="date"
+  name="assessment_date"
+  min="2000-01-01"
+  max="2100-12-31"
+  required
+/>
+</div>
+<div class="field">
+<label class="field-label required" for="assessment_period">Assessment Period</label>
+<input id="assessment_period" type="text" name="assessment_period" placeholder="e.g. January–June 2026" required />
+</div>
+<div class="field">
+<label class="field-label required" for="employee_email">Employee Email</label>
+<input id="employee_email" type="email" name="employee_email" autocomplete="email" required />
+</div>
+<div class="field">
+<label class="field-label required" for="supervisor_email">Supervisor Email</label>
+<input id="supervisor_email" type="email" name="supervisor_email" required />
+</div>
+</div>
+<div class="field" style="margin-top:18px;">
+<label class="field-label required">Assessment Type</label>
+<div class="assessment-types" id="assessmentTypeGroup">
+<label class="check-chip"><input type="checkbox" name="assessment_type[]" value="Regularization"><span>Regularization</span></label>
+<label class="check-chip"><input type="checkbox" name="assessment_type[]" value="Mid-Year"><span>Mid-Year</span></label>
+<label class="check-chip"><input type="checkbox" name="assessment_type[]" value="Annual"><span>Annual</span></label>
+<label class="check-chip"><input type="checkbox" name="assessment_type[]" value="Monthly"><span>Monthly</span></label>
+<label class="check-chip"><input type="checkbox" name="assessment_type[]" value="Confirmation"><span>Confirmation</span></label>
+</div>
+<div class="helper">Select at least one assessment type.</div>
+</div>
+</section>
+<!-- 02 Performance Goals -->
+<section class="form-section" id="performanceGoalsSection">
+<div class="section-heading kpi-section-heading">
+<div class="section-number">02</div>
+<div class="section-heading-copy">
+<h2>Performance Goals</h2>
+<p>Add KPIs as needed. Ratings use a 1.0–5.0 scale in 0.5 increments, and the total KPI weight must equal 100% before submission.</p>
+</div>
+<button type="button" class="btn btn-secondary btn-add-kpi no-print" id="addKpiBtn">+ Add KPI</button>
+</div>
+<div class="rating-guide">
+<div><strong>5</strong><span>Exceeds Expectations / Outstanding</span></div>
+<div><strong>4</strong><span>Exceeds Some Expectations</span></div>
+<div><strong>3</strong><span>Meets Expectations</span></div>
+<div><strong>2</strong><span>Meets Some Expectations</span></div>
+<div><strong>1</strong><span>Does Not Meet Expectations</span></div>
+</div>
+<div class="kpi-table-wrap">
+<table class="kpi-table">
+<thead>
+<tr>
+<th>KPI</th>
+<th>Goal</th>
+<th>Actual Score</th>
+<th>Weight %</th>
+<th>Rating</th>
+<th class="no-print">Action</th>
+</tr>
+</thead>
+<tbody id="kpiBody"></tbody>
+</table>
+</div>
+<textarea name="performance_kpis" id="performance_kpis" hidden></textarea>
+<div class="score-row kpi-score-row">
+<div>
+<p>Weighted Performance Goals score based on all KPI ratings and weights.</p>
+<div class="kpi-weight-status" id="kpiWeightStatus">Total KPI Weight: 0% · Must equal 100%</div>
+</div>
+<div class="field"><label class="field-label">Performance Goals Average Score</label><input type="text" name="performance_goals_average" readonly></div>
+</div>
+</section>
+<!-- 03 Personal Effectiveness -->
+<section class="form-section">
+<div class="section-heading">
+<div class="section-number">03</div>
+<div>
+<h2>Personal Effectiveness</h2>
+<p>Qualitative assessment to be completed by the immediate supervisor.</p>
+</div>
+</div>
+<div class="competency-card">
+<div class="competency-head"><strong>Productivity</strong><span class="weight-pill">3 criteria</span></div>
+<div class="competency-body">
+<div class="competency-line">
+<div class="descriptor">Makes realistic goals, meets deadlines, and completes tasks.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_productivity1"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_productivity1" class="effect-rating" required></select></div>
+</div>
+<div class="competency-line">
+<div class="descriptor">Looks for efficiencies, shows good judgment, and works smarter.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_productivity2"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_productivity2" class="effect-rating" required></select></div>
+</div>
+<div class="competency-line">
+<div class="descriptor">Delegates clearly.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_productivity3"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_productivity3" class="effect-rating" required></select></div>
+</div>
+</div>
+</div>
+<div class="competency-card">
+<div class="competency-head"><strong>Personal Development</strong><span class="weight-pill">2 criteria</span></div>
+<div class="competency-body">
+<div class="competency-line">
+<div class="descriptor">Even-tempered under pressure.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_personal_dev1"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_personal_dev1" class="effect-rating" required></select></div>
+</div>
+<div class="competency-line">
+<div class="descriptor">Sets high standards for self and establishes challenging goals.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_personal_dev2"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_personal_dev2" class="effect-rating" required></select></div>
+</div>
+</div>
+</div>
+<div class="competency-card">
+<div class="competency-head"><strong>Leadership</strong><span class="weight-pill">3 criteria</span></div>
+<div class="competency-body">
+<div class="competency-line">
+<div class="descriptor">Leads by example, finds realistic solutions, and resolves conflicts.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_leadership1"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_leadership1" class="effect-rating" required></select></div>
+</div>
+<div class="competency-line">
+<div class="descriptor">Establishes clear expectations, provides resources, and acts decisively.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_leadership2"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_leadership2" class="effect-rating" required></select></div>
+</div>
+<div class="competency-line">
+<div class="descriptor">Brings out the best in team members.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_leadership3"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_leadership3" class="effect-rating" required></select></div>
+</div>
+</div>
+</div>
+<div class="competency-card">
+<div class="competency-head"><strong>Relationship</strong><span class="weight-pill">2 criteria</span></div>
+<div class="competency-body">
+<div class="competency-line">
+<div class="descriptor">Strong customer advocate who sets aside personal biases and wants.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_relationship1"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_relationship1" class="effect-rating" required></select></div>
+</div>
+<div class="competency-line">
+<div class="descriptor">Gives good and practical advice and fosters employee loyalty.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_relationship2"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_relationship2" class="effect-rating" required></select></div>
+</div>
+</div>
+</div>
+<div class="competency-card">
+<div class="competency-head"><strong>Management</strong><span class="weight-pill">2 criteria</span></div>
+<div class="competency-body">
+<div class="competency-line">
+<div class="descriptor">Prioritizes tasks and responds quickly and effectively to problems.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_management1"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_management1" class="effect-rating" required></select></div>
+</div>
+<div class="competency-line">
+<div class="descriptor">Manages costs effectively, develops strategy, and organizes tasks.</div>
+<div class="field"><label class="field-label">Remarks</label><textarea name="remarks_management2"></textarea></div>
+<div class="field rating-field"><label class="field-label required">Rating</label><select name="rating_management2" class="effect-rating" required></select></div>
+</div>
+</div>
+</div>
+<div class="score-row">
+<p>Average of all Personal Effectiveness ratings.</p>
+<div class="field"><label class="field-label">Personal Effectiveness Average Score</label><input type="text" name="personal_effectiveness_average" readonly></div>
+</div>
+</section>
+<!-- 04 Strengths and Improvement -->
+<section class="form-section">
+<div class="section-heading">
+<div class="section-number">04</div>
+<div>
+<h2>Strengths &amp; Areas for Improvement</h2>
+<p>Document key strengths and specific opportunities for development.</p>
+</div>
+</div>
+<div class="textarea-pair">
+<div class="field"><label class="field-label">Strengths</label><textarea name="strengths" rows="5" placeholder="Highlight key strengths, contributions, and positive behaviors."></textarea></div>
+<div class="field"><label class="field-label">Areas for Improvement</label><textarea name="areas_for_improvement" rows="5" placeholder="Identify clear and actionable improvement areas."></textarea></div>
+</div>
+</section>
+<!-- 05 Development Plan -->
+<section class="form-section">
+<div class="section-heading">
+<div class="section-number">05</div>
+<div>
+<h2>Development Plan</h2>
+<p>Mutually agreed actions to improve or develop skills, knowledge, and abilities.</p>
+</div>
+</div>
+<div class="development-grid">
+<div class="development-row">
+<h3>Development Item 1</h3>
+<div class="development-fields">
+<div class="field"><label class="field-label">Improvement / Development Area</label><input type="text" name="dev_area1"></div>
+<div class="field"><label class="field-label">Development Activities</label><textarea name="dev_activities1"></textarea></div>
+<div class="field"><label class="field-label">Target Date</label><input type="date" name="dev_target1" min="2000-01-01" max="2100-12-31"></div>
+<div class="field"><label class="field-label">Success Criteria</label><textarea name="dev_criteria1"></textarea></div>
+<div class="field"><label class="field-label">Status</label><input type="text" name="dev_status1" placeholder="e.g. Planned"></div>
+</div>
+</div>
+<div class="development-row">
+<h3>Development Item 2</h3>
+<div class="development-fields">
+<div class="field"><label class="field-label">Improvement / Development Area</label><input type="text" name="dev_area2"></div>
+<div class="field"><label class="field-label">Development Activities</label><textarea name="dev_activities2"></textarea></div>
+<div class="field"><label class="field-label">Target Date</label><input type="date" name="dev_target2" min="2000-01-01" max="2100-12-31"></div>
+<div class="field"><label class="field-label">Success Criteria</label><textarea name="dev_criteria2"></textarea></div>
+<div class="field"><label class="field-label">Status</label><input type="text" name="dev_status2" placeholder="e.g. Planned"></div>
+</div>
+</div>
+<div class="development-row">
+<h3>Development Item 3</h3>
+<div class="development-fields">
+<div class="field"><label class="field-label">Improvement / Development Area</label><input type="text" name="dev_area3"></div>
+<div class="field"><label class="field-label">Development Activities</label><textarea name="dev_activities3"></textarea></div>
+<div class="field"><label class="field-label">Target Date</label><input type="date" name="dev_target3" min="2000-01-01" max="2100-12-31"></div>
+<div class="field"><label class="field-label">Success Criteria</label><textarea name="dev_criteria3"></textarea></div>
+<div class="field"><label class="field-label">Status</label><input type="text" name="dev_status3" placeholder="e.g. Planned"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 06 Summary -->
+<section class="form-section">
+<div class="section-heading">
+<div class="section-number">06</div>
+<div>
+<h2>Performance Summary</h2>
+<p>Performance Goals contribute 60% and Personal Effectiveness contributes 40% to the overall score.</p>
+</div>
+</div>
+<div class="summary-grid">
+<div class="summary-card">
+<span>Performance Goals · 60%</span>
+<strong id="summaryGoalsDisplay">—</strong>
+<small>Weighted contribution</small>
+<input type="hidden" name="summary_goals" readonly>
+</div>
+<div class="summary-card">
+<span>Personal Effectiveness · 40%</span>
+<strong id="summaryEffectivenessDisplay">—</strong>
+<small>Weighted contribution</small>
+<input type="hidden" name="summary_effectiveness" readonly>
+</div>
+<div class="summary-card overall">
+<span>Overall Score</span>
+<strong id="summaryOverallDisplay">—</strong>
+<small>Final weighted score out of 5.0</small>
+<input type="hidden" name="summary_overall" readonly>
+</div>
+</div>
+</section>
+<!-- 07 Comments & Signatures -->
+<section class="form-section">
+<div class="section-heading">
+<div class="section-number">07</div>
+<div>
+<h2>Comments &amp; Signatures</h2>
+<p></p>
+</div>
+</div>
+<div class="grid-3">
+<div class="field"><label class="field-label">Evaluated Employee Comment</label><textarea name="employee_comment" rows="6"></textarea></div>
+<div class="field"><label class="field-label">Immediate Supervisor Comment</label><textarea name="supervisor_comment" rows="6"></textarea></div>
+<div class="field"><label class="field-label">Manager / Department Head Comment</label><textarea name="manager_comment" rows="6"></textarea></div>
+</div>
+<div class="signature-note" style="margin-top:16px;">
+<strong>Signatures are optional.</strong></div>
+<div class="signature-grid">
+<div class="signature-card">
+<h3>Evaluated Employee Signature <span class="optional-badge">Optional</span></h3>
+<p>Employee signs after reviewing the evaluation and comments.</p>
+<div class="signature-canvas-wrap">
+<canvas id="employeeSignaturePad" class="signature-canvas" aria-label="Employee signature pad"></canvas>
+</div>
+<div class="signature-actions no-print">
+<span class="signature-state" id="employeeSignatureState">Not signed</span>
+<button type="button" class="btn btn-secondary btn-small" data-clear-signature="employee">Clear</button>
+</div>
+</div>
+<div class="signature-card">
+<h3>Immediate Supervisor Signature <span class="optional-badge">Optional</span></h3>
+<p>Immediate supervisor signs to confirm the completed evaluation.</p>
+<div class="signature-canvas-wrap">
+<canvas id="supervisorSignaturePad" class="signature-canvas" aria-label="Supervisor signature pad"></canvas>
+</div>
+<div class="signature-actions no-print">
+<span class="signature-state" id="supervisorSignatureState">Not signed</span>
+<button type="button" class="btn btn-secondary btn-small" data-clear-signature="supervisor">Clear</button>
+</div>
+</div>
+<div class="signature-card">
+<h3>Manager / Department Head Signature <span class="optional-badge">Optional</span></h3>
+<p>Manager or department head signs for final acknowledgement.</p>
+<div class="signature-canvas-wrap">
+<canvas id="managerSignaturePad" class="signature-canvas" aria-label="Manager signature pad"></canvas>
+</div>
+<div class="signature-actions no-print">
+<span class="signature-state" id="managerSignatureState">Not signed</span>
+<button type="button" class="btn btn-secondary btn-small" data-clear-signature="manager">Clear</button>
+</div>
+</div>
+</div>
+<!-- Signature image payloads. Power Automate will convert these data URIs to PNG attachments. -->
+<input type="hidden" name="employee_signature_data" id="employee_signature_data" value="">
+<input type="hidden" name="supervisor_signature_data" id="supervisor_signature_data" value="">
+<input type="hidden" name="manager_signature_data" id="manager_signature_data" value="">
+</section>
+<div class="actions no-print">
+<div class="action-left">Required fields are marked with an asterisk (*).</div>
+<div class="action-buttons">
+<button type="button" class="btn btn-secondary" onclick="window.print()">Print</button>
+<button type="submit" class="btn btn-primary" id="submitBtn">Submit Evaluation</button>
+</div>
+</div>
+</form>
+</main>
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="modal" id="modalBox">
+<div class="modal-icon" id="modalIcon">✓</div>
+<h3 id="modalTitle">Done</h3>
+<p id="modalMessage"></p>
+<button type="button" class="btn btn-primary" id="modalClose">OK</button>
+</div>
+</div>
+<script>
+    // ========================================================
+    // CONFIGURATION
+    // Replace this with the Power Automate HTTP trigger URL later.
+    // ========================================================
+    const FLOW_CREATE_URL = "";
+
+    const form = document.getElementById('appraisalForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // ========================================================
+    // SIGNATURE PADS
+    // The PNG data is included in the JSON payload for Power Automate.
+    // ========================================================
+    const signaturePads = {};
+
+    function setupSignaturePad(role, canvasId, stateId) {
+      const canvas = document.getElementById(canvasId);
+      const state = document.getElementById(stateId);
+      if (!canvas || typeof SignaturePad === 'undefined') return null;
+
+      const rect = canvas.getBoundingClientRect();
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+      canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+      const ctx = canvas.getContext('2d');
+      ctx.scale(ratio, ratio);
+
+      const pad = new SignaturePad(canvas, {
+        minWidth: 0.7,
+        maxWidth: 2.2,
+        penColor: '#17211b',
+        backgroundColor: 'rgb(255,255,255)'
+      });
+
+      const updateState = () => {
+        const signed = !pad.isEmpty();
+        state.textContent = signed ? 'Signed' : 'Not signed';
+        state.classList.toggle('signed', signed);
+      };
+
+      pad.addEventListener('endStroke', updateState);
+      pad._updateState = updateState;
+      signaturePads[role] = pad;
+      return pad;
+    }
+
+    function clearSignature(role) {
+      const pad = signaturePads[role];
+      if (!pad) return;
+      pad.clear();
+      if (pad._updateState) pad._updateState();
+    }
+
+    function setSignaturePayloads() {
+      const now = new Date().toISOString();
+      const roles = ['employee', 'supervisor', 'manager'];
+
+      roles.forEach(role => {
+        const pad = signaturePads[role];
+        const signed = !!pad && !pad.isEmpty();
+        const hidden = document.getElementById(`${role}_signature_data`);
+        if (hidden) hidden.value = signed ? pad.toDataURL('image/png') : '';
+      });
+
+      return {
+        employeeSigned: !!signaturePads.employee && !signaturePads.employee.isEmpty(),
+        supervisorSigned: !!signaturePads.supervisor && !signaturePads.supervisor.isEmpty(),
+        managerSigned: !!signaturePads.manager && !signaturePads.manager.isEmpty(),
+        signedAt: now
+      };
+    }
+
+    function resetSignatures() {
+      ['employee', 'supervisor', 'manager'].forEach(clearSignature);
+      ['employee_signature_data', 'supervisor_signature_data', 'manager_signature_data'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+    }
+
+    document.querySelectorAll('[data-clear-signature]').forEach(button => {
+      button.addEventListener('click', () => clearSignature(button.dataset.clearSignature));
+    });
+
+    const ratingValues = ["5", "4.5", "4", "3.5", "3", "2.5", "2", "1.5", "1"];
+
+    // ========================================================
+    // DYNAMIC PERFORMANCE KPIs
+    // One KPI is shown initially. Additional rows can be added as needed.
+    // ========================================================
+    function ratingOptions(selected = '') {
+      return '<option value="" disabled' + (selected ? '' : ' selected') + '>Select rating</option>' +
+        ratingValues.map(value => `<option value="${value}"${String(selected) === value ? ' selected' : ''}>${value}</option>`).join('');
+    }
+
+    function addKPIRow(values = {}) {
+      const tbody = document.getElementById('kpiBody');
+      const row = document.createElement('tr');
+      row.dataset.kpiRow = 'true';
+      row.innerHTML = `
+        <td class="kpi-col-name"><div class="field"><input type="text" data-kpi-field="kpi" value="${escapeHtmlAttr(values.kpi ?? '')}" placeholder="e.g. CCTR" required></div></td>
+        <td class="kpi-col-goal"><div class="field"><input type="text" data-kpi-field="goal" value="${escapeHtmlAttr(values.goal ?? '')}" placeholder="Goal / target" required></div></td>
+        <td class="kpi-col-actual"><div class="field"><textarea data-kpi-field="actualScore" placeholder="Actual score / evidence" required>${escapeHtmlText(values.actualScore ?? '')}</textarea></div></td>
+        <td class="kpi-col-weight"><div class="field"><input type="number" data-kpi-field="weight" min="0.5" max="100" step="0.5" value="${escapeHtmlAttr(values.weight ?? '20')}" required></div></td>
+        <td class="kpi-col-rating"><div class="field"><select class="goal-rating" data-kpi-field="rating" required>${ratingOptions(values.rating ?? '')}</select></div></td>
+        <td class="kpi-col-action no-print"><button type="button" class="kpi-delete" title="Remove KPI" aria-label="Remove KPI">Delete</button></td>`;
+      tbody.appendChild(row);
+      row.querySelector('.kpi-delete').addEventListener('click', () => {
+        if (document.querySelectorAll('[data-kpi-row]').length <= 1) return;
+        row.remove();
+        updateKpiDeleteButtons();
+        calculateAverages();
+      });
+      row.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', calculateAverages);
+        el.addEventListener('change', calculateAverages);
+      });
+      updateKpiDeleteButtons();
+      calculateAverages();
+    }
+
+    function escapeHtmlAttr(value) {
+      return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function escapeHtmlText(value) {
+      return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function updateKpiDeleteButtons() {
+      const buttons = Array.from(document.querySelectorAll('.kpi-delete'));
+      const disable = buttons.length <= 1;
+      buttons.forEach(button => button.disabled = disable);
+    }
+
+    function getKpiRows() {
+      return Array.from(document.querySelectorAll('[data-kpi-row]')).map((row, index) => ({
+        index: index + 1,
+        kpi: row.querySelector('[data-kpi-field="kpi"]').value.trim(),
+        goal: row.querySelector('[data-kpi-field="goal"]').value.trim(),
+        actualScore: row.querySelector('[data-kpi-field="actualScore"]').value.trim(),
+        weight: parseFloat(row.querySelector('[data-kpi-field="weight"]').value),
+        rating: parseFloat(row.querySelector('[data-kpi-field="rating"]').value)
+      }));
+    }
+
+    function buildPerformanceKpisText() {
+      return getKpiRows().map(item => [
+        `KPI ${item.index}`,
+        `KPI: ${item.kpi}`,
+        `Goal: ${item.goal}`,
+        `Actual Score: ${item.actualScore}`,
+        `Weight: ${Number.isFinite(item.weight) ? item.weight : ''}%`,
+        `Rating: ${Number.isFinite(item.rating) ? item.rating : ''}`
+      ].join('\n')).join('\n\n');
+    }
+
+    document.getElementById('addKpiBtn').addEventListener('click', () => addKPIRow({ weight: '20' }));
+
+    function populateRatingSelects() {
+      document.querySelectorAll('.effect-rating').forEach(select => {
+        if (select.options.length) return;
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select rating';
+        placeholder.selected = true;
+        placeholder.disabled = true;
+        select.appendChild(placeholder);
+
+        ratingValues.forEach(value => {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+      });
+    }
+
+    function validNumericValues(selector) {
+      return Array.from(document.querySelectorAll(selector))
+        .map(el => parseFloat(el.value))
+        .filter(Number.isFinite);
+    }
+
+    function setFieldValue(name, value) {
+      const el = document.querySelector(`[name="${name}"]`);
+      if (el) el.value = value;
+    }
+
+    function calculateAverages() {
+      const kpis = getKpiRows();
+      const totalWeight = kpis.reduce((sum, item) => sum + (Number.isFinite(item.weight) ? item.weight : 0), 0);
+      const allKpiRatingsComplete = kpis.length > 0 && kpis.every(item => Number.isFinite(item.rating));
+      const weightedSum = kpis.reduce((sum, item) => {
+        if (!Number.isFinite(item.weight) || !Number.isFinite(item.rating)) return sum;
+        return sum + (item.weight * item.rating);
+      }, 0);
+      const goalsAvg = totalWeight > 0 && allKpiRatingsComplete ? weightedSum / totalWeight : 0;
+      const weightIs100 = Math.abs(totalWeight - 100) < 0.001;
+      const goalsReady = allKpiRatingsComplete && weightIs100;
+
+      const weightStatus = document.getElementById('kpiWeightStatus');
+      weightStatus.textContent = `Total KPI Weight: ${Number(totalWeight.toFixed(2))}% · ${weightIs100 ? 'Ready' : 'Must equal 100%'}`;
+      weightStatus.classList.toggle('valid', weightIs100);
+      weightStatus.classList.toggle('invalid', !weightIs100);
+
+      const effectRatings = validNumericValues('.effect-rating');
+      const effectComplete = effectRatings.length === document.querySelectorAll('.effect-rating').length;
+      const effectAvg = effectRatings.length
+        ? effectRatings.reduce((a, b) => a + b, 0) / effectRatings.length
+        : 0;
+
+      setFieldValue('performance_goals_average', allKpiRatingsComplete && totalWeight > 0 ? goalsAvg.toFixed(2) : '');
+      setFieldValue('personal_effectiveness_average', effectRatings.length ? effectAvg.toFixed(1) : '');
+
+      const weightedGoals = goalsAvg * 0.60;
+      const weightedEffectiveness = effectAvg * 0.40;
+      const overall = weightedGoals + weightedEffectiveness;
+
+      setFieldValue('summary_goals', goalsReady ? weightedGoals.toFixed(2) : '');
+      setFieldValue('summary_effectiveness', effectComplete ? weightedEffectiveness.toFixed(2) : '');
+      setFieldValue('summary_overall', (goalsReady && effectComplete) ? overall.toFixed(2) : '');
+
+      document.getElementById('summaryGoalsDisplay').textContent = goalsReady ? weightedGoals.toFixed(2) : '—';
+      document.getElementById('summaryEffectivenessDisplay').textContent = effectComplete ? weightedEffectiveness.toFixed(2) : '—';
+      document.getElementById('summaryOverallDisplay').textContent = (goalsReady && effectComplete) ? overall.toFixed(2) : '—';
+      document.getElementById('heroOverall').textContent = (goalsReady && effectComplete) ? overall.toFixed(2) : '—';
+    }
+
+    function updatePreview(textarea, previewId) {
+      const text = textarea.value.trim();
+      const preview = document.getElementById(previewId);
+      if (/^https?:\/\//i.test(text)) {
+        preview.href = text;
+        preview.style.display = 'inline-block';
+      } else {
+        preview.removeAttribute('href');
+        preview.style.display = 'none';
+      }
+    }
+    window.updatePreview = updatePreview;
+
+    function showModal(type, title, message) {
+      const backdrop = document.getElementById('modalBackdrop');
+      const box = document.getElementById('modalBox');
+      const icon = document.getElementById('modalIcon');
+
+      box.classList.remove('error', 'warning');
+      if (type === 'error') box.classList.add('error');
+      if (type === 'warning') box.classList.add('warning');
+
+      icon.textContent = type === 'error' ? '!' : type === 'warning' ? 'i' : '✓';
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMessage').textContent = message;
+      backdrop.classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.remove('show');
+    }
+
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalBackdrop').addEventListener('click', e => {
+      if (e.target.id === 'modalBackdrop') closeModal();
+    });
+
+    function clearValidationState() {
+      document.querySelectorAll('.invalid-field').forEach(el => el.classList.remove('invalid-field'));
+      document.querySelectorAll('.field-error').forEach(el => el.remove());
+    }
+
+    function markInvalid(el, message) {
+      el.classList.add('invalid-field');
+      const field = el.closest('.field');
+      if (field && !field.querySelector('.field-error')) {
+        const error = document.createElement('div');
+        error.className = 'field-error';
+        error.textContent = message;
+        field.appendChild(error);
+      }
+    }
+
+function isSafeDate(value) {
+  if (!value) return true; // optional dates can be blank
+
+  // Must be exactly YYYY-MM-DD
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+
+  if (year < 2000 || year > 2100) return false;
+
+  const date = new Date(year, month - 1, day);
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
+
+    function validateForm() {
+      clearValidationState();
+      let firstInvalid = null;
+
+      const requiredFields = Array.from(form.querySelectorAll('[required]'));
+      requiredFields.forEach(el => {
+        if (!el.value || !String(el.value).trim()) {
+          markInvalid(el, 'This field is required.');
+          if (!firstInvalid) firstInvalid = el;
+        }
+      });
+
+      const empEmail = form.elements['employee_email'];
+      const supEmail = form.elements['supervisor_email'];
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (empEmail.value && !emailPattern.test(empEmail.value.trim())) {
+        markInvalid(empEmail, 'Enter a valid employee email address.');
+        if (!firstInvalid) firstInvalid = empEmail;
+      }
+
+      if (supEmail.value && !emailPattern.test(supEmail.value.trim())) {
+        markInvalid(supEmail, 'Enter a valid supervisor email address.');
+        if (!firstInvalid) firstInvalid = supEmail;
+      }
+
+      const dateFields = [
+  {
+    field: form.elements['assessment_date'],
+    label: 'Assessment Date',
+    required: true
+  },
+  {
+    field: form.elements['dev_target1'],
+    label: 'Development Item 1 Target Date',
+    required: false
+  },
+  {
+    field: form.elements['dev_target2'],
+    label: 'Development Item 2 Target Date',
+    required: false
+  },
+  {
+    field: form.elements['dev_target3'],
+    label: 'Development Item 3 Target Date',
+    required: false
+  }
+];
+
+for (const item of dateFields) {
+  const value = item.field?.value?.trim() || '';
+
+  if (!value && !item.required) {
+    continue;
+  }
+
+  if (!isSafeDate(value)) {
+    markInvalid(
+      item.field,
+      'Enter a valid date using a year between 2000 and 2100.'
+    );
+
+    item.field.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    showModal(
+      'error',
+      'Check date',
+      `${item.label} is invalid. Please enter a valid date with a 4-digit year between 2000 and 2100.`
+    );
+
+    return false;
+  }
+}
+
+      const assessmentTypes = document.querySelectorAll('input[name="assessment_type[]"]:checked');
+      if (!assessmentTypes.length) {
+        const group = document.getElementById('assessmentTypeGroup');
+        group.style.outline = '2px solid rgba(217,45,32,.5)';
+        group.style.outlineOffset = '4px';
+        if (!firstInvalid) firstInvalid = group;
+      } else {
+        const group = document.getElementById('assessmentTypeGroup');
+        group.style.outline = '';
+        group.style.outlineOffset = '';
+      }
+
+      const kpis = getKpiRows();
+      const totalKpiWeight = kpis.reduce((sum, item) => sum + (Number.isFinite(item.weight) ? item.weight : 0), 0);
+      if (!kpis.length || Math.abs(totalKpiWeight - 100) >= 0.001) {
+        const section = document.getElementById('performanceGoalsSection');
+        section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showModal('error', 'Check KPI weights', `The total KPI weight is ${Number(totalKpiWeight.toFixed(2))}%. Adjust the KPI weights so the total equals 100% before submitting.`);
+        return false;
+      }
+
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showModal('error', 'Please complete the form', 'Some required information or ratings are still missing. The first incomplete field has been highlighted.');
+        return false;
+      }
+
+      return true;
+    }
+
+    function serializeForm() {
+      const signatureState = setSignaturePayloads();
+      const kpiPayload = document.getElementById('performance_kpis');
+      if (kpiPayload) kpiPayload.value = buildPerformanceKpisText();
+      const fd = new FormData(form);
+      const data = {};
+
+      fd.forEach((value, key) => {
+        if (key.endsWith('[]')) {
+          const cleanKey = key.slice(0, -2);
+          (data[cleanKey] ??= []).push(value);
+        } else {
+          data[key] = typeof value === 'string' ? value.trim() : value;
+        }
+      });
+
+      // Backend tracking fields already available in SharePoint.
+      data.appraisal_status = 'Submitted';
+      data.employee_signature_status = signatureState.employeeSigned ? 'Signed' : 'Pending';
+      data.supervisor_signature_status = signatureState.supervisorSigned ? 'Signed' : 'Pending';
+      data.manager_signature_status = signatureState.managerSigned ? 'Signed' : 'Pending';
+      data.employee_signed_date = signatureState.employeeSigned ? signatureState.signedAt : '';
+      data.supervisor_signed_date = signatureState.supervisorSigned ? signatureState.signedAt : '';
+      data.manager_signed_date = signatureState.managerSigned ? signatureState.signedAt : '';
+
+      return data;
+    }
+
+    form.addEventListener('input', calculateAverages);
+    form.addEventListener('change', calculateAverages);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      calculateAverages();
+      if (!validateForm()) return;
+
+      if (!FLOW_CREATE_URL || FLOW_CREATE_URL === 'PASTE_FLOW_A_URL_HERE') {
+        showModal(
+          'warning',
+          'Form design is ready',
+          'The XMC Power Automate endpoint has not been connected yet.'
+        );
+        return;
+      }
+
+      const data = serializeForm();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      try {
+        const response = await fetch(FLOW_CREATE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Flow returned HTTP ${response.status}`);
+        }
+
+        showModal('success', 'Evaluation submitted', 'The performance evaluation was submitted successfully.');
+        form.reset();
+        document.getElementById('kpiBody').innerHTML = '';
+        addKPIRow({ kpi: 'CCTR', goal: 'Actual CCTR/CCTR Goal', weight: '20' });
+        document.getElementById('performance_kpis').value = '';
+        resetSignatures();
+        document.querySelectorAll('.evidence-preview').forEach(el => el.style.display = 'none');
+        calculateAverages();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        console.error(error);
+        showModal('error', 'Submission failed', 'The evaluation could not be submitted. Please try again or contact the administrator.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Evaluation';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      populateRatingSelects();
+      addKPIRow({ kpi: 'CCTR', goal: 'Actual CCTR/CCTR Goal', weight: '20' });
+      setupSignaturePad('employee', 'employeeSignaturePad', 'employeeSignatureState');
+      setupSignaturePad('supervisor', 'supervisorSignaturePad', 'supervisorSignatureState');
+      setupSignaturePad('manager', 'managerSignaturePad', 'managerSignatureState');
+      calculateAverages();
+    });
+  
+    // ====== Click-to-edit Objectives / Indicators ======
+    document.querySelectorAll('.click-to-edit-field').forEach((field) => {
+      field.addEventListener('click', () => {
+        if (field.readOnly) {
+          field.readOnly = false;
+          field.classList.add('is-editing');
+          field.focus();
+          field.select();
+        }
+      });
+
+      field.addEventListener('blur', () => {
+        field.readOnly = true;
+        field.classList.remove('is-editing');
+      });
+
+      field.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          field.blur();
+        }
+        if (event.key === 'Escape') {
+          field.blur();
+        }
+      });
+    });
+
+</script>
+</body>
+</html>
