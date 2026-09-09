@@ -639,13 +639,187 @@
 
     @media (max-width: 900px) { .signature-grid { grid-template-columns: 1fr; } }
 
+    .print-field-value {
+  display: none;
+}
+
     @media print {
-      body { background: #fff; }
-      .topbar, .actions, .no-print { display: none !important; }
-      .page { width: 100%; margin: 0; }
-      .hero, .form-section { box-shadow: none; break-inside: avoid; }
-      .form-section { margin-top: 12px; }
-    }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  html,
+  body {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  body {
+    font-size: 10px !important;
+  }
+
+  .topbar,
+  .actions,
+  .no-print,
+  .field-error {
+    display: none !important;
+  }
+
+  .page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .hero,
+  .form-section {
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .form-section {
+    margin-top: 10px !important;
+    padding: 14px !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .section-heading {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* =========================
+     KPI PRINT FIX
+     ========================= */
+
+  .kpi-table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .kpi-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+
+  .kpi-table th,
+  .kpi-table td {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    padding: 6px !important;
+    font-size: 9px !important;
+    vertical-align: top !important;
+  }
+
+  .kpi-table th:nth-child(1),
+  .kpi-table td:nth-child(1) {
+    width: 18% !important;
+  }
+
+  .kpi-table th:nth-child(2),
+  .kpi-table td:nth-child(2) {
+    width: 22% !important;
+  }
+
+  .kpi-table th:nth-child(3),
+  .kpi-table td:nth-child(3) {
+    width: 34% !important;
+  }
+
+  .kpi-table th:nth-child(4),
+  .kpi-table td:nth-child(4) {
+    width: 10% !important;
+  }
+
+  .kpi-table th:nth-child(5),
+  .kpi-table td:nth-child(5) {
+    width: 16% !important;
+  }
+
+  .kpi-table th:nth-child(6),
+  .kpi-table td:nth-child(6) {
+    display: none !important;
+  }
+
+  /* Hide normal controls only while printing */
+  #appraisalForm
+    input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  #appraisalForm textarea,
+  #appraisalForm select {
+    display: none !important;
+  }
+
+  /* Printable wrapping values */
+  .print-field-value {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 28px !important;
+
+    padding: 6px 8px !important;
+
+    border: 1px solid #ded4cf !important;
+    border-radius: 6px !important;
+
+    background: #fff !important;
+    color: #202124 !important;
+
+    white-space: pre-wrap !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+
+    font-size: 9px !important;
+    line-height: 1.35 !important;
+  }
+
+  .kpi-table .print-field-value {
+    min-height: 25px !important;
+    padding: 5px !important;
+  }
+
+  .kpi-table tr,
+  .competency-line,
+  .development-row,
+  .score-row,
+  .summary-card,
+  .signature-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .rating-guide {
+    break-inside: avoid !important;
+  }
+
+  .score-row,
+  .kpi-score-row {
+    width: 100% !important;
+    grid-template-columns: 1fr 180px !important;
+  }
+
+  .development-fields {
+    grid-template-columns: 1fr 1.3fr !important;
+  }
+}
   
     /* Fixed appraisal criteria: locked by default, click to edit */
     .click-to-edit-field[readonly] {
@@ -1103,7 +1277,13 @@
 <div class="actions no-print">
 <div class="action-left">Required fields are marked with an asterisk (*).</div>
 <div class="action-buttons">
-<button type="button" class="btn btn-secondary" onclick="window.print()">Print</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  onclick="printEvaluation()"
+>
+  Print
+</button>
 <button type="submit" class="btn btn-primary" id="submitBtn">Submit Evaluation</button>
 </div>
 </div>
@@ -1608,6 +1788,94 @@ for (const item of dateFields) {
         submitBtn.textContent = 'Submit Evaluation';
       }
     });
+
+
+// ========================================================
+// PRINT PREPARATION
+// ========================================================
+
+function clearPrintFieldValues() {
+  document
+    .querySelectorAll('.print-field-value')
+    .forEach(element => element.remove());
+}
+
+function getPrintableControlValue(control) {
+
+  if (control.tagName === 'SELECT') {
+    const selectedOption =
+      control.options[control.selectedIndex];
+
+    return selectedOption
+      ? selectedOption.textContent.trim()
+      : '';
+  }
+
+  if (control.type === 'date' && control.value) {
+    const parts = control.value.split('-');
+
+    if (parts.length === 3) {
+      return `${parts[1]}/${parts[2]}/${parts[0]}`;
+    }
+  }
+
+  return control.value || '';
+}
+
+function preparePrintView() {
+
+  clearPrintFieldValues();
+
+  const controls = form.querySelectorAll(`
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select
+  `);
+
+  controls.forEach(control => {
+
+    if (control.hidden) return;
+
+    const printableValue =
+      document.createElement('div');
+
+    printableValue.className =
+      'print-field-value';
+
+    const value =
+      getPrintableControlValue(control);
+
+    printableValue.textContent =
+      value.trim() || '—';
+
+    control.insertAdjacentElement(
+      'afterend',
+      printableValue
+    );
+  });
+}
+
+function cleanupPrintView() {
+  clearPrintFieldValues();
+}
+
+function printEvaluation() {
+
+  preparePrintView();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.print();
+    });
+  });
+}
+
+
+
+window.addEventListener(
+  'afterprint',
+  cleanupPrintView
+);
 
     document.addEventListener('DOMContentLoaded', () => {
       populateRatingSelects();
